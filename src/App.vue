@@ -1,27 +1,84 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <LoginView v-if="!isLoggedIn"/>
+  <div class="grid" v-if="isLoggedIn">
+    <MenuView />
+    <PlayerView/>
+    <MainView/>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import MainView from './components/MainView.vue';
+import MenuView from './components/MenuView.vue';
+import PlayerView from './components/PlayerView.vue';
+import LoginView from './components/LoginView.vue';
+
+
+import store from './store';
+import LoginViewVue from './components/LoginView.vue';
 
 export default defineComponent({
   name: 'App',
+  mounted() {
+    if (this.$cookies.get('access_token'))this.$store.commit('login', this.$cookies.get('access_token'))
+  },
+  computed: {
+    isLoggedIn(): boolean {
+      return this.$store.getters.isLoggedIn;
+    }
+  },
   components: {
-    HelloWorld
+    MenuView, PlayerView, MainView, LoginView
   }
 });
 </script>
 
 <style lang="scss">
-#app {
+:root {
+  --background-color: black;
+  --item-background-color: #121212;
+  --accent-color: rgb(255, 0, 64);
+  --panel-gap: 8px;
+}
+
+*  {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--item-background-color);
+  height: 100%;
+}
+
+body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: white;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#app {
+
+  .grid {
+    position: absolute;
+    grid-template-areas: "left-sidebar main-view right-sidebar" "play-bar play-bar play-bar";
+    padding: var(--panel-gap) 0px 0px var(--panel-gap);
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr auto;
+    gap: var(--panel-gap);
+    display: grid;
+    height: 100%;
+    width: 100%;
+  }
+  
+  width: 100%;
+  height: 100%;
+  background-color: var(--background-color);
 }
 </style>

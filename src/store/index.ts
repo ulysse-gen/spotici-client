@@ -1,6 +1,8 @@
 import { createStore } from 'vuex'
 import cookies from 'js-cookie'
 
+import router from '@/router/index';
+
 export default createStore({
   state: {
     auth: {
@@ -8,14 +10,13 @@ export default createStore({
       access_token: cookies.get('access_token') || null
     },
     app: {
-      view: "/home",
       searchResults: {tracks: [], albums: [], artists: [], playlists: []} as SpotIci.LibraryQueryResult,
       player: new Audio(),
       data: {
         nowPlaying: {
-          artists: [] as Array<string>,
-          album: null as null | string,
-          track: null as null | string,
+          artists: [] as Array<SpotIci.Artist>,
+          album: undefined as SpotIci.Album | undefined,
+          track: undefined as SpotIci.Track | undefined,
           duration: 0,
           currentTime: 0
         },
@@ -45,14 +46,13 @@ export default createStore({
       state.auth.user = await User.data;
       state.auth.access_token = access_token;
       cookies.set('access_token', access_token);
+      router.push('/');
     },
     async logOut(state) {
       cookies.remove('access_token');
       state.auth.user = null;
       state.auth.access_token = null;
-    },
-    navigate(state, path) {
-      state.app.view = path;
+      router.push('/login');
     },
     setSearchResults(state, searchResults: SpotIci.LibraryQueryResult) {
       state.app.searchResults = searchResults;
@@ -64,9 +64,9 @@ export default createStore({
       state.app.searchResults.playlists = state.app.searchResults.playlists.filter(playlist => searchResults.playlists.map(playlist2 => playlist2.id).includes(playlist.id)).concat(searchResults.playlists);
     },
     async nowPlaying(state, Track: SpotIci.Track) {
-      state.app.data.nowPlaying.album = Track.album.id;
-      state.app.data.nowPlaying.track = Track.id;
-      state.app.data.nowPlaying.artists = Track.artists.map(artist => artist.id);
+      state.app.data.nowPlaying.album = Track.album;
+      state.app.data.nowPlaying.track = Track;
+      state.app.data.nowPlaying.artists = Track.artists;
       state.app.data.nowPlaying.duration = state.app.player.duration;
       state.app.data.state = "playing";
     },
@@ -88,7 +88,7 @@ export default createStore({
       state.app.data.nextUp = [...TrackOrTracks];
     },
     clearNowPlaying(state) {
-      state.app.data.nowPlaying.album = state.app.data.nowPlaying.track = null;
+      state.app.data.nowPlaying.album = state.app.data.nowPlaying.track = undefined;
       state.app.data.nowPlaying.artists = [];
     },
     playPause(state) {
@@ -104,27 +104,38 @@ export default createStore({
     songProgress(state, currentTime) {
       state.app.data.nowPlaying.currentTime = currentTime;
     },
+    seek(state, value) {
+       state.app.player.currentTime = value;
+    },
+    volume(state, value) {
+      state.app.player.volume = value;
+    }
   },
   actions: {
-    async playTrack(context, PlayInfos: {Track: SpotIci.Track, Context?: Array<SpotIci.Track>, addContextToNextUp: false}) {
-      await fetch("http://localhost:3000/v1/tracks/play/" + PlayInfos.Track.id, {
+    async LoadTrack(context, Track: SpotIci.Track){
+      return (Track.buffer) ? await Track.buffer :  await fetch("http://localhost:3000/v1/tracks/play/" + Track.id, {
         method: "GET",
         headers: {
           "Content-Type": "audio/mpeg",
           "Authorization": "Bearer " + this.state.auth.access_token
         }
-      }).then(async res => res.arrayBuffer()).then(async buffer => {
-        if (PlayInfos.addContextToNextUp && PlayInfos.Context) {
-          const TrackIndex = PlayInfos.Context.findIndex((track: any) => track.id == PlayInfos.Track.id);
-          const addSongsTonextUp = PlayInfos.Context.slice(TrackIndex+1);
-          this.commit('setNextUp', addSongsTonextUp);
-        }
-        this.state.app.player.src = URL.createObjectURL(new Blob([buffer]));
-        await this.state.app.player.play();
-        this.commit("nowPlaying", PlayInfos.Track)
-        const ctx = new AudioContext();
-        return ctx.decodeAudioData(buffer);
+      }).then(async res => {
+        return res.arrayBuffer()
       });
+    },
+    async playTrack(context, PlayInfos: {Track: SpotIci.Track, Context?: Array<SpotIci.Track>, addContextToNextUp: false}) {
+      const buffer = await this.dispatch('LoadTrack', PlayInfos.Track);
+      if (PlayInfos.addContextToNextUp && PlayInfos.Context) {
+        const TrackIndex = PlayInfos.Context.findIndex((track: any) => track.id == PlayInfos.Track.id);
+        const addSongsTonextUp = PlayInfos.Context.slice(TrackIndex+1);
+        this.commit('setNextUp', addSongsTonextUp);
+      }
+      this.dispatch('loadComingSong', 4);
+      this.state.app.player.src = URL.createObjectURL(new Blob([buffer]));
+      await this.state.app.player.play();
+      this.commit("nowPlaying", PlayInfos.Track)
+      const ctx = new AudioContext();
+      return ctx.decodeAudioData(buffer);
     },
     async songFinished(context) {
       this.state.app.data.nowPlaying.currentTime = this.state.app.player.duration;
@@ -133,10 +144,27 @@ export default createStore({
       if (this.state.app.data.nextUp.length != 0) return this.dispatch('playTrack', {Track: this.state.app.data.nextUp.shift()});
       this.state.app.data.state = "stopped";
     },
+    async loadComingSong(context, amount = 1) {
+      if (this.state.app.data.repeat) return;
+      if (this.state.app.data.queue.length != 0){
+        const Tracks = this.state.app.data.queue.slice(0, (amount <= this.state.app.data.queue.length) ? amount : this.state.app.data.queue.length);
+        for (const Track of Tracks) {
+          Track.buffer = await this.dispatch('LoadTrack', Track);
+        }
+        return;
+      }
+      if (this.state.app.data.nextUp.length != 0){
+        const Tracks = this.state.app.data.nextUp.slice(0, (amount <= this.state.app.data.nextUp.length) ? amount : this.state.app.data.nextUp.length);
+        for (const Track of Tracks) {
+          Track.buffer = await this.dispatch('LoadTrack', Track);
+        }
+        return;
+      }
+    },
     async playNextSong() {
       if (this.state.app.data.queue.length != 0) return this.dispatch('playTrack', {Track: this.state.app.data.queue.shift()});
       if (this.state.app.data.nextUp.length != 0) return this.dispatch('playTrack', {Track: this.state.app.data.nextUp.shift()});
-    }
+    },
   },
   modules: {
   }

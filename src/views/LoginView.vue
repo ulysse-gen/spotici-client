@@ -48,7 +48,6 @@ export default defineComponent({
       } catch(error) {
         //Error while logging in
       }
-      console.log(`Proccessing logging in of ${this.usernameOrEmail}:${this.password}`)
     }
   },
   data() {

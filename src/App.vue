@@ -1,35 +1,14 @@
 <template>
-  <LoginView v-if="!isLoggedIn"/>
-  <div class="grid" v-if="isLoggedIn">
-    <MenuView />
-    <PlayerView/>
-    <MainView/>
-  </div>
+  <router-view/>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import MainView from './components/MainView.vue';
-import MenuView from './components/MenuView.vue';
-import PlayerView from './components/PlayerView.vue';
-import LoginView from './components/LoginView.vue';
-
-
-import store from './store';
-import LoginViewVue from './components/LoginView.vue';
 
 export default defineComponent({
   name: 'App',
   mounted() {
     if (this.$cookies.get('access_token'))this.$store.commit('login', this.$cookies.get('access_token'))
-  },
-  computed: {
-    isLoggedIn(): boolean {
-      return this.$store.getters.isLoggedIn;
-    }
-  },
-  components: {
-    MenuView, PlayerView, MainView, LoginView
   }
 });
 </script>

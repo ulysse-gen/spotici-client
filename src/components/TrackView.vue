@@ -1,14 +1,14 @@
 <template>
-  <div class="track" @dblclick="playSong" @auxclick="trackOptions" :class="{ nowPlaying: isPlaying, queued: inQueue, nextUp: inNextUp }">
+  <div class="track" @dblclick="playSong" @contextmenu.prevent="trackOptions" :class="{ nowPlaying: (isPlaying && (!mode || mode != 'queue')), queued: inQueue, nextUp: inNextUp }">
     <div class="play-button" @click="playSong">
-      <font-awesome-icon icon="fa-solid fa-play"/>
+      <font-awesome-icon icon="fa-solid fa-play" v-if="!mode || mode == 'search'"/>
     </div>
     <div class="track-infos">
       <span class="name">{{ track?.name }}</span>
       <span class="artists">
         <template v-bind:key="artist.id" v-for="(artist, index) in track?.artists">
           <template v-if="index > 0">, </template>
-          <span class="artist-name" @click="gotoArtist(artist.id)">{{ artist.name }}</span>
+          <span class="artist-name" @click="$router.push(`/artist/${artist.id}`)">{{ artist.name }}</span>
         </template>
       </span>
     </div>
@@ -26,7 +26,7 @@ export default defineComponent({
       return this.$store.state.app.player;
     },
     isPlaying() {
-      return this.$store.state.app.data.nowPlaying.track == this.track?.id;
+      return this.$store.state.app.data.nowPlaying.track && (this.$store.state.app.data.nowPlaying.track.id == this.track?.id);
     },
     inQueue() {
       return this.$store.state.app.data.queue.map((track: any) => track.id).includes(this.track?.id)
@@ -36,19 +36,18 @@ export default defineComponent({
     }
   },
   props: {
-    track: Object// as PropType<SpotIci.Track>
+    track: Object,// as PropType<SpotIci.Track>,
+    mode: String
   },
   methods: {
     async playSong() {
       await this.$store.dispatch('playTrack', {Track: this.track, Context: this.$store.state.app.searchResults.tracks, addContextToNextUp: true});
     },
     async trackOptions(event: any) {
-      if (event.button == 2){
-        if (!this.inQueue) {
-          this.$store.commit('addToQueue', this.track);
-        }else if (this.inQueue) {
-          this.$store.commit('removeFromQueue', this.track);
-        }
+      if (!this.inQueue) {
+        this.$store.commit('addToQueue', this.track);
+      }else if (this.inQueue) {
+        this.$store.commit('removeFromQueue', this.track);
       }
     },
     gotoArtist(artistId: string) {

@@ -8,6 +8,9 @@ namespace SpotIci {
         artistsNames: string;
         duration_ms: number;
         release: string;
+        buffer?: ArrayBuffer | Promise<ArrayBuffer>;
+        track_number: number;
+        disc_number: number;
     }
 
     interface Album {
@@ -15,6 +18,8 @@ namespace SpotIci {
         name: string;
         artists: Array<Artist>;
         release: string;
+        total_tracks: number;
+        image: string | undefined;
     }
 
     interface Artist {

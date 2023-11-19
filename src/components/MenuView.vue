@@ -1,8 +1,8 @@
 <template>
   <div class="grid-item menu-and-library">
     <div class="menu">
-      <button @click="navigate('/home')"><font-awesome-icon icon="fa-solid fa-house" />Home</button>
-      <button @click="navigate('/search')"><font-awesome-icon icon="fa-solid fa-magnifying-glass" />Search</button>
+      <RouterLink to="/"><button><font-awesome-icon icon="fa-solid fa-house" />Home</button></RouterLink>
+      <RouterLink to="/search"><button><font-awesome-icon icon="fa-solid fa-magnifying-glass" />Search</button></RouterLink>
     </div>
     <div class="library">
       Library: Playlists, Albums, Artists
@@ -43,7 +43,7 @@ export default defineComponent({
     flex-direction: column;
     width: 100%;
 
-    button {
+    a button {
       background-color: transparent;
       border: transparent;
       outline: transparent;

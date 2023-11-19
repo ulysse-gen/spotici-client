@@ -1,27 +1,36 @@
 <template>
-  <div class="grid-item main">
+  <div class="grid-item main" v-if="isLoggedIn">
     <MainHeaderView/>
-    <MainHomeView v-if="app.view == '/home'"/>
-    <MainSearchView v-if="app.view == '/search'"/>
+    <MainHomeView v-if="options?.home"/>
+    <MainSearchView v-if="options?.search" v-bind:options="options.search"/>
+    <MainQueueView v-if="options?.queue"/>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import MainHeaderView from './MainHeaderView.vue';
-import MainHomeView from './MainHomeView.vue';
-import MainSearchView from './MainSearchView.vue';
+import MainHeaderView from '@/components/MainHeaderView.vue';
+import MainHomeView from '@/components/MainHomeView.vue';
+import MainSearchView from '@/components/MainSearchView.vue';
+import MainQueueView from './MainQueueView.vue';
 
 export default defineComponent({
   name: 'MainView',
   components: {
     MainHeaderView,
     MainHomeView,
-    MainSearchView
+    MainSearchView,
+    MainQueueView
+  },
+  props: {
+    options: Object
   },
   computed: {
     app() { 
       return this.$store.state.app;
+    },
+    isLoggedIn(): boolean {
+      return this.$store.getters.isLoggedIn;
     }
   }
 });

@@ -68,7 +68,6 @@ export default defineComponent({
   },
   computed: {
     nowPlaying() {
-      console.log(this.$store.state.app.data.nowPlaying)
       return this.$store.state.app.data.nowPlaying
     },
     app() {
@@ -169,8 +168,10 @@ export default defineComponent({
       margin-left: var(--panel-gap);
       display: flex;
       flex-direction: column;
+      font-family: 'Noto Sans Glagolitic', sans-serif;
+      
       .name {
-        color: white;
+        color: var(--light-color-lighter);
       }
 
       .artists {
@@ -178,11 +179,11 @@ export default defineComponent({
       flex-direction: row;
       font-size: .8rem;
         .artist-name{
-            color: #9a9a9a;
+            color: var(--light-color-darker);
             cursor: pointer;
             &:hover {
               text-decoration: underline;
-              color: white;
+              color: var(--light-color-lighter);
             }
           }
       }
@@ -220,9 +221,9 @@ export default defineComponent({
         &.play, &.pause {
           width: 30px;
           height: 30px;
-          background-color: white;
+          background-color: var(--light-color-lighter);
           border-radius: 50%;
-          color: black;
+          color: var(--primary-background-deep);
           padding: 7px;
           margin: 0 5px 0 5px;
         }
@@ -254,7 +255,7 @@ export default defineComponent({
         appearance: none;
         cursor: pointer;
         width: 100%;
-        background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) var(--progress-percent), #404040 var(--progress-percent), #404040 100%);
+        background: linear-gradient(90deg, var(--light-color-lighter) 0%, var(--light-color-lighter) var(--progress-percent), var(--light-color-darker) var(--progress-percent), var(--light-color-darker) 100%);
         transition-duration: .2s;
         border-radius: 2.5px;
 
@@ -268,7 +269,7 @@ export default defineComponent({
         }
 
         &::-webkit-slider-runnable-track {
-          background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) var(--progress-percent), #404040 var(--progress-percent), #404040 100%);
+          background: linear-gradient(90deg, var(--light-color-lighter) 0%, var(--light-color-lighter) var(--progress-percent), var(--light-color-darker) var(--progress-percent), var(--light-color-darker) 100%);
           border-radius: 2.5px;
           height: 5px;
         }
@@ -284,10 +285,10 @@ export default defineComponent({
         }
 
         &:hover {
-          background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color) var(--progress-percent), #404040 var(--progress-percent), #404040 100%);
+          background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color) var(--progress-percent), var(--light-color-darker) var(--progress-percent), var(--light-color-darker) 100%);
           
           &::-webkit-slider-runnable-track {
-            background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color) var(--progress-percent), #404040 var(--progress-percent), #404040 100%);
+            background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color) var(--progress-percent), var(--light-color-darker) var(--progress-percent), var(--light-color-darker) 100%);
           }
 
           &::-webkit-slider-thumb {
@@ -312,11 +313,11 @@ export default defineComponent({
         display: flex;
         justify-content: center;
         align-items: center;
-        color: #404040;
+        color: var(--light-color-darker);
         transition-duration: .2s;
 
         &:hover {
-          color: white;
+          color: var(--light-color-lighter);
         }
     }
 
@@ -333,11 +334,11 @@ export default defineComponent({
         display: flex;
         justify-content: center;
         align-items: center;
-        color: #404040;
+        color: var(--light-color-darker);
         transition-duration: .2s;
 
         &:hover {
-          color: white;
+          color: var(--light-color-lighter);
         }
       }
 
@@ -346,7 +347,7 @@ export default defineComponent({
           appearance: none;
           cursor: pointer;
           width: 100px;
-          background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) var(--volume-percent), #404040 var(--volume-percent), #404040 100%);
+          background: linear-gradient(90deg, var(--light-color-lighter) 0%, var(--light-color-lighter) var(--volume-percent), var(--light-color-darker) var(--volume-percent), var(--light-color-darker) 100%);
           transition-duration: .2s;
           border-radius: 2.5px;
           margin-left: 5px;
@@ -361,7 +362,7 @@ export default defineComponent({
           }
 
           &::-webkit-slider-runnable-track {
-            background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) var(--volume-percent), #404040 var(--volume-percent), #404040 100%);
+            background: linear-gradient(90deg, var(--light-color-lighter) 0%, var(--light-color-lighter) var(--volume-percent), var(--light-color-darker) var(--volume-percent), var(--light-color-darker) 100%);
             border-radius: 2.5px;
             height: 5px;
           }
@@ -377,10 +378,10 @@ export default defineComponent({
           }
 
           &:hover {
-            background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color) var(--volume-percent), #404040 var(--volume-percent), #404040 100%);
+            background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color) var(--volume-percent), var(--light-color-darker) var(--volume-percent), var(--light-color-darker) 100%);
             
             &::-webkit-slider-runnable-track {
-              background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color) var(--volume-percent), #404040 var(--volume-percent), #404040 100%);
+              background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color) var(--volume-percent), var(--light-color-darker) var(--volume-percent), var(--light-color-darker) 100%);
             }
 
             &::-webkit-slider-thumb {

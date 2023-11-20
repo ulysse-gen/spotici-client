@@ -24,9 +24,9 @@ export default defineComponent({
     background-color: #00000036;
     border: none;
     outline: none;
-    color: white;
+    color: var(--light-color-lighter);
     height: fit-content;
-    margin: 5px;
+    margin: var(--panel-gap);
     padding: 5px;
     border-radius: 10px;
     display: flex;
@@ -52,6 +52,7 @@ export default defineComponent({
     .track-infos {
       display: flex;
       flex-direction: column;
+      font-family: 'Rubik', sans-serif;
     }
   }
 </style>

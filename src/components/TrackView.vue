@@ -3,6 +3,7 @@
     <div class="play-button" @click="playSong">
       <font-awesome-icon icon="fa-solid fa-play" v-if="!mode || mode == 'search'"/>
     </div>
+    <img class="artwork" v-bind:src="track?.album.image"/>
     <div class="track-infos">
       <span class="name">{{ track?.name }}</span>
       <span class="artists">
@@ -60,12 +61,12 @@ export default defineComponent({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
   .track {
-    background-color: #00000036;
+    background-color: var(--tertiary-background-light);
     border: none;
     outline: none;
-    color: white;
-    height: fit-content;
-    margin: 5px;
+    color: var(--light-color-lighter);
+    height: 55px;
+    margin: calc(var(--panel-gap)/2) var(--panel-gap) calc(var(--panel-gap)/2) var(--panel-gap);
     padding: 5px;
     border-radius: 10px;
     display: flex;
@@ -79,17 +80,24 @@ export default defineComponent({
       cursor: pointer;
     }
 
+    .artwork {
+      height: 90%;
+      border-radius: 5px;
+    }
+
     .track-infos {
       display: flex;
       flex-direction: column;
+      margin-left: var(--panel-gap);
+      font-family: 'Noto Sans Glagolitic', sans-serif;
 
       .artists {
           .artist-name{
-            color: #9a9a9a;
+            color: var(--light-color-main);
             cursor: pointer;
             &:hover {
               text-decoration: underline;
-              color: white;
+              color: var(--light-color-lighter);
             }
           }
         }
@@ -115,14 +123,14 @@ export default defineComponent({
     }
 
     &:hover {
-      background-color: #0000007a;
+    background-color: var(--tertiary-background-main);
       .play-button {
         color: var(--accent-color);
       }
     }
     
     &:active {
-      background-color: #000000c2;
+    background-color: var(--tertiary-background-deep);
     }
   }
 </style>

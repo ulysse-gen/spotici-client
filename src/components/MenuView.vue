@@ -34,7 +34,7 @@ export default defineComponent({
 
   .menu, .library {
     border-radius: 10px;
-    background-color: #121212;
+    background-color: var(--secondary-background-main);
     padding: 10px;
   }
 
@@ -44,10 +44,11 @@ export default defineComponent({
     width: 100%;
 
     a button {
+      font-family: 'Rubik', sans-serif;
       background-color: transparent;
       border: transparent;
       outline: transparent;
-      color: #ffffffbb;
+      color: var(--light-color-main);
       transition-duration: .2s;
       height: 40px;
       text-align: left;
@@ -59,7 +60,7 @@ export default defineComponent({
       }
 
       &:hover {
-        color: #fff;
+        color: var(--light-color-lighter);
       }
     }
   }

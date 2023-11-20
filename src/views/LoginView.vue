@@ -41,7 +41,8 @@ export default defineComponent({
         const Response = await Auth;
         if (Response.status == 200) {
           const Data = (await Response.json()).data;
-          this.$store.commit("login", Data.token.access_token);
+          await this.$store.dispatch("login", Data.token.access_token);
+          this.$router.push('/');
         } else {
           //Could not login
         }
@@ -74,7 +75,7 @@ export default defineComponent({
  }
 
  .login-modal {
-    background-color: var(--item-background-color);
+    background-color: var(--secondary-background-main);
     padding: 10px;
     border-radius: 10px;
     min-width: 40%;

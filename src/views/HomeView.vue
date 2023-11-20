@@ -15,7 +15,6 @@ import PlayerView from '@/components/PlayerView.vue';
 export default defineComponent({
   name: 'App',
   mounted() {
-    if (this.$cookies.get('access_token'))this.$store.commit('login', this.$cookies.get('access_token'))
     if (!this.isLoggedIn)this.$router.push('/login');
   },
   props: {

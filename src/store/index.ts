@@ -34,20 +34,6 @@ export default createStore({
     }
   },
   mutations: {
-    async login(state, access_token: string) {
-      const UserRequest = await fetch("http://localhost:3000/v1/users/@me", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + access_token
-          }
-      });
-      const User: {data: any} = (await UserRequest.json());
-      state.auth.user = await User.data;
-      state.auth.access_token = access_token;
-      cookies.set('access_token', access_token);
-      router.push('/');
-    },
     async logOut(state) {
       cookies.remove('access_token');
       state.auth.user = null;
@@ -58,10 +44,10 @@ export default createStore({
       state.app.searchResults = searchResults;
     },
     addSearchResults(state, searchResults: SpotIci.LibraryQueryResult) {
-      state.app.searchResults.tracks = state.app.searchResults.tracks.filter(track => searchResults.tracks.map(track2 => track2.id).includes(track.id)).concat(searchResults.tracks);
-      state.app.searchResults.albums = state.app.searchResults.albums.filter(album => searchResults.albums.map(album2 => album2.id).includes(album.id)).concat(searchResults.albums);
-      state.app.searchResults.artists = state.app.searchResults.artists.filter(artist => searchResults.artists.map(artist2 => artist2.id).includes(artist.id)).concat(searchResults.artists);
-      state.app.searchResults.playlists = state.app.searchResults.playlists.filter(playlist => searchResults.playlists.map(playlist2 => playlist2.id).includes(playlist.id)).concat(searchResults.playlists);
+      state.app.searchResults.tracks = state.app.searchResults.tracks.filter(track => !searchResults.tracks.map(track2 => track2.id).includes(track.id)).concat(searchResults.tracks);
+      state.app.searchResults.albums = state.app.searchResults.albums.filter(album => !searchResults.albums.map(album2 => album2.id).includes(album.id)).concat(searchResults.albums);
+      state.app.searchResults.artists = state.app.searchResults.artists.filter(artist => !searchResults.artists.map(artist2 => artist2.id).includes(artist.id)).concat(searchResults.artists);
+      state.app.searchResults.playlists = state.app.searchResults.playlists.filter(playlist => !searchResults.playlists.map(playlist2 => playlist2.id).includes(playlist.id)).concat(searchResults.playlists);
     },
     async nowPlaying(state, Track: SpotIci.Track) {
       state.app.data.nowPlaying.album = Track.album;
@@ -91,6 +77,12 @@ export default createStore({
       state.app.data.nowPlaying.album = state.app.data.nowPlaying.track = undefined;
       state.app.data.nowPlaying.artists = [];
     },
+    clearQueue(state) {
+      state.app.data.queue = [];
+    },
+    clearNextUp(state) {
+      state.app.data.nextUp = [];
+    },
     playPause(state) {
       if (state.app.data.state == "playing") {
         state.app.data.state = "paused";
@@ -112,6 +104,20 @@ export default createStore({
     }
   },
   actions: {
+    async login(state, access_token: string) {
+      const UserRequest = await fetch("http://localhost:3000/v1/users/@me", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + access_token
+          }
+      });
+      const User: {data: any} = (await UserRequest.json());
+      this.state.auth.user = await User.data;
+      this.state.auth.access_token = access_token;
+      cookies.set('access_token', access_token);
+      return;
+    },
     async LoadTrack(context, Track: SpotIci.Track){
       return (Track.buffer) ? await Track.buffer :  await fetch("http://localhost:3000/v1/tracks/play/" + Track.id, {
         method: "GET",

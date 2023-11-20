@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="profile">
-      <button @click="profileMenu = !profileMenu;" class="login-button"><img v-bind:src="`/assets/img/pfp/${profilePicture}.jpg`"></button>
+      <button @click="profileMenu = !profileMenu;" class="profile-button"><img v-bind:src="`/assets/img/pfp/${profilePicture}.jpg`"></button>
       <div class="profile-menu" v-if="profileMenu">
         <button @click="logOut">Log Out</button>
       </div>
@@ -43,8 +43,8 @@ export default defineComponent({
       margin-left: auto;
       height: 32px;
       width: 32px;
-      .login-button {
-        background-color: #00000054;
+      .profile-button {
+        background-color: var(--tertiary-background-main);
         border: transparent;
         outline: transparent;
         border-radius: 50%;
@@ -57,13 +57,13 @@ export default defineComponent({
         cursor: pointer;
 
         &:hover {
-        background-color: #000000c9;
+        background-color: var(--tertiary-background-deep);
         transform: scale(1.1);
         }
 
         &:active {
           opacity: .5;
-        transform: scale(1.03);
+          transform: scale(1.03);
         }
 
         img {
@@ -76,23 +76,24 @@ export default defineComponent({
         position: relative;
         right: 150%;
         top: 10px;
-        background-color: var(--item-background-color);
+        background-color: var(--secondary-background-main);
         padding: 5px;
         width: fit-content;
         border-radius: 10px;
+        font-family: 'Rubik', sans-serif;
 
         button {
-          background-color: var(--item-background-color);
+          background-color: var(--secondary-background-main);
           border: transparent;
           outline: transparent;
           border-radius: 5px;
-          color: white;
+          color: var(--light-color-lighter);
           white-space:nowrap;
           min-width: 100%;
           padding: 5px;
 
           &:hover {
-            background-color: #333333;
+            background-color: var(--light-color-darker);
           }
         }
       }

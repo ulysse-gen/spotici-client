@@ -40,7 +40,7 @@ export default defineComponent({
 <style scoped lang="scss">
  .main {
     border-radius: 10px;
-    background-color: var(--item-background-color);
+    background-color: var(--secondary-background-main);
     grid-area: main-view;
 
     background: linear-gradient(45deg, rgba(12, 60, 125, 1), rgba(107, 17, 17,1));

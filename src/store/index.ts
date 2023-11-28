@@ -2,12 +2,14 @@ import { createStore } from 'vuex'
 import cookies from 'js-cookie'
 
 import router from '@/router/index';
+import Socket from '@/assets/classes/Socket';
 
 export default createStore({
   state: {
     auth: {
       user: null as null | object,
-      access_token: cookies.get('access_token') || null
+      access_token: cookies.get('access_token') || null,
+      socket: {} as Socket
     },
     app: {
       searchResults: {tracks: [], albums: [], artists: [], playlists: []} as SpotIci.LibraryQueryResult,
@@ -101,6 +103,9 @@ export default createStore({
     },
     volume(state, value) {
       state.app.player.volume = value;
+    },
+    setSocket(state, socket) {
+      state.auth.socket = socket;
     }
   },
   actions: {
@@ -116,6 +121,7 @@ export default createStore({
       this.state.auth.user = await User.data;
       this.state.auth.access_token = access_token;
       cookies.set('access_token', access_token);
+      this.commit('setSocket', new Socket("http://localhost:4000/").Start());
       return;
     },
     async LoadTrack(context, Track: SpotIci.Track){

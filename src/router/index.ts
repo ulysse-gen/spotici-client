@@ -26,6 +26,14 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
+    path: '/players',
+    name: 'players',
+    component: () => import('../views/HomeView.vue'),
+    props: {
+      options: { players: true }
+    }
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')

@@ -3,6 +3,7 @@ import cookies from 'js-cookie'
 
 import router from '@/router/index';
 import Socket from '@/assets/classes/Socket';
+import Player from '@/assets/classes/Player';
 
 export default createStore({
   state: {
@@ -24,6 +25,7 @@ export default createStore({
         },
         queue: [] as Array<SpotIci.Track>,
         nextUp: [] as Array<SpotIci.Track>,
+        players: new Map as Map<string, Player>,
         state: "stopped" as "stopped" | "playing" | "paused",
         shuffle: false,
         repeat: false
@@ -47,6 +49,7 @@ export default createStore({
     },
     addSearchResults(state, searchResults: SpotIci.LibraryQueryResult) {
       state.app.searchResults.tracks = state.app.searchResults.tracks.filter(track => !searchResults.tracks.map(track2 => track2.id).includes(track.id)).concat(searchResults.tracks);
+      state.app.searchResults.tracks = state.app.searchResults.tracks.filter(track => !searchResults.tracks.map(track2 => track2.id).includes(track.id)).concat(searchResults.tracks);
       state.app.searchResults.albums = state.app.searchResults.albums.filter(album => !searchResults.albums.map(album2 => album2.id).includes(album.id)).concat(searchResults.albums);
       state.app.searchResults.artists = state.app.searchResults.artists.filter(artist => !searchResults.artists.map(artist2 => artist2.id).includes(artist.id)).concat(searchResults.artists);
       state.app.searchResults.playlists = state.app.searchResults.playlists.filter(playlist => !searchResults.playlists.map(playlist2 => playlist2.id).includes(playlist.id)).concat(searchResults.playlists);
@@ -57,6 +60,7 @@ export default createStore({
       state.app.data.nowPlaying.artists = Track.artists;
       state.app.data.nowPlaying.duration = state.app.player.duration;
       state.app.data.state = "playing";
+      (state.app.data.players.get('this') as Player).setPlaying().nowPlaying(Track);
     },
     addToQueue(state, TrackOrTracks: SpotIci.Track | Array<SpotIci.Track>) {
       if (Array.isArray(TrackOrTracks)){
@@ -89,26 +93,44 @@ export default createStore({
       if (state.app.data.state == "playing") {
         state.app.data.state = "paused";
         state.app.player.pause();
+        (state.app.data.players.get('this') as Player).setPlaying(false);
       }else if (state.app.data.state == "paused" || state.app.data.state == "stopped") {
         if (!state.app.data.nowPlaying.track)return;
         state.app.data.state = "playing";
         state.app.player.play();
+        (state.app.data.players.get('this') as Player).setPlaying(true);
       }
     },
     songProgress(state, currentTime) {
       state.app.data.nowPlaying.currentTime = currentTime;
+      (state.app.data.players.get('this') as Player).setProgression(currentTime);
     },
     seek(state, value) {
        state.app.player.currentTime = value;
+       (state.app.data.players.get('this') as Player).setProgression(value);
     },
     volume(state, value) {
       state.app.player.volume = value;
+      (state.app.data.players.get('this') as Player).setVolume(value);
     },
-    setSocket(state, socket) {
-      state.auth.socket = socket;
+    NewPlayer(state, Player) {
+      state.app.data.players.set(Player.UUID, Player);
+    },
+    DeletePlayer(state, PlayerUUID) {
+      state.app.data.players.delete(PlayerUUID);
+    },
+    SyncPlayer(state, data) {
+      if (!state.app.data.players.get(data.UUID))return;
+      const player = state.app.data.players.get(data.UUID) as Player;
+      if (data.isPlaying)player.setPlaying(data.isPlaying);
+      if (data.progression)player.setProgression(data.progression);
+      if (data.track)player.nowPlaying(data.track);
     }
   },
   actions: {
+    async SocketAuthed(state, UUID: string) {
+      (this.state.app.data.players.get('this') as Player).setUUID(UUID).setId('this');
+    },
     async login(state, access_token: string) {
       const UserRequest = await fetch("http://localhost:3000/v1/users/@me", {
           method: "GET",
@@ -121,7 +143,9 @@ export default createStore({
       this.state.auth.user = await User.data;
       this.state.auth.access_token = access_token;
       cookies.set('access_token', access_token);
-      this.commit('setSocket', new Socket("http://localhost:4000/").Start());
+      this.state.auth.socket = new Socket("http://localhost:4000/").Start();
+      this.state.app.data.players.set('this', this.state.auth.socket.setPlayer(new Player(this.state.auth.socket).setName(window.navigator.userAgent)));
+      router.push('/');
       return;
     },
     async LoadTrack(context, Track: SpotIci.Track){

@@ -42,7 +42,6 @@ export default defineComponent({
         if (Response.status == 200) {
           const Data = (await Response.json()).data;
           await this.$store.dispatch("login", Data.token.access_token);
-          this.$router.push('/');
         } else {
           //Could not login
         }

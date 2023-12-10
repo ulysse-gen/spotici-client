@@ -8,7 +8,7 @@
         <span class="name">{{ nowPlaying.track.name }}</span>
         <span class="artists">
           <template v-bind:key="artist.id" v-for="(artist, index) in nowPlaying.track?.artists">
-            <template v-if="index > 0">, </template>
+            <template  v-if="index > 0">, </template>
             <span class="artist-name" @click="$router.push(`/artist/${artist.id}`)">{{ artist.name }}</span>
           </template>
         </span>
@@ -38,6 +38,9 @@
       <div class="player-bar"><input @change="seek" @input="Seeking" type="range" v-bind:value="songProgress()" class="progress-bar" min="0" v-bind:max="app.data.nowPlaying.duration"></div>
     </div>
     <div class="player-child right-controls">
+      <div class="players">
+        <font-awesome-icon icon="fa-solid fa-headphones" @click="$router.push('/players')" />
+      </div>
       <div class="queue">
         <font-awesome-icon icon="fa-solid fa-bars" @click="$router.push('/queue')" />
       </div>
@@ -307,7 +310,7 @@ export default defineComponent({
     height: 100%;
     justify-content: flex-end;
 
-    .queue {
+    .queue, .players {
         width: 20px;
         height: 20px;
         display: flex;

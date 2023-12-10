@@ -4,6 +4,7 @@
     <MainHomeView v-if="options?.home"/>
     <MainSearchView v-if="options?.search" v-bind:options="options.search"/>
     <MainQueueView v-if="options?.queue"/>
+    <MainPlayersView v-if="options?.players"/>
   </div>
 </template>
 
@@ -13,6 +14,7 @@ import MainHeaderView from '@/components/MainHeaderView.vue';
 import MainHomeView from '@/components/MainHomeView.vue';
 import MainSearchView from '@/components/MainSearchView.vue';
 import MainQueueView from './MainQueueView.vue';
+import MainPlayersView from './MainPlayersView.vue';
 
 export default defineComponent({
   name: 'MainView',
@@ -20,7 +22,8 @@ export default defineComponent({
     MainHeaderView,
     MainHomeView,
     MainSearchView,
-    MainQueueView
+    MainQueueView,
+    MainPlayersView
   },
   props: {
     options: Object

@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="profile">
-      <button @click="profileMenu = !profileMenu;" class="profile-button"><img v-bind:src="`/assets/img/pfp/${profilePicture}.jpg`"></button>
+      <button @click="profileMenu = !profileMenu;" class="profile-button"><img v-bind:src="`http://localhost:3000/v1/images/${profilePicture}`"></button>
       <div class="profile-menu" v-if="profileMenu">
         <button @click="logOut">Log Out</button>
       </div>
@@ -26,7 +26,9 @@ export default defineComponent({
   },
   computed: {
     profilePicture() {
-      return this.$store.state.auth.user.profilePicture;
+      return 0
+      /*console.log(this.$store.state.auth.user)
+      return this.$store.state.auth.user.images[0].url;*/
     }
   }
 });
